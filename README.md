@@ -28,8 +28,8 @@ how LiteLLM ships its own table):
    and cache it locally; on any failure, fall back to the bundled snapshot.
 
 ```
-https://raw.githubusercontent.com/<owner>/llm-price-table/main/model_prices.json
-https://raw.githubusercontent.com/<owner>/llm-price-table/main/plan_prices.json
+https://raw.githubusercontent.com/superposed-labs/llm-price-table/main/model_prices.json
+https://raw.githubusercontent.com/superposed-labs/llm-price-table/main/plan_prices.json
 ```
 
 Keep the fetch **opt-in** if your project is local-first — never surprise the
