@@ -55,6 +55,35 @@ A dated list; each entry is the price effective from a date:
 - `observed` — the day the number was read off the source. Provenance only.
 - `source` — short note on where the number came from.
 
+#### Optional: `context_pricing`
+
+Models whose official page has distinct short/long context tiers can keep the
+short tier in the top-level fields and attach the full tier split here:
+
+```jsonc
+{
+  "effective_date": "YYYY-MM-DD",
+  "observed": "YYYY-MM-DD",
+  "in": 2.5, "out": 15.0, "cw": 2.5, "cr": 0.25,
+  "context_pricing": {
+    "metric": "input_tokens_total",
+    "short_max": 272000,
+    "short": { "in": 2.5, "out": 15.0, "cw": 2.5, "cr": 0.25 },
+    "long":  { "in": 5.0, "out": 22.5, "cw": 5.0, "cr": 0.5 }
+  }
+}
+```
+
+- `metric` — currently `input_tokens_total`, meaning the consumer should choose
+  the tier from the request's original billed input before any cache-read split.
+- `short_max` — inclusive threshold for the short tier (`<= short_max` = short;
+  `> short_max` = long).
+- `short` / `long` — complete rate objects for each tier. Consumers should use
+  these leaf values when the block is present, not the top-level `in/out/cw/cr`.
+
+The top-level `in/out/cw/cr` should mirror the short tier so older consumers
+that ignore `context_pricing` still get a conservative result instead of a null.
+
 ### Recording a change (important)
 
 - Price **changed** → **ADD** a new entry with the new `effective_date`. **Do not
@@ -65,8 +94,8 @@ A dated list; each entry is the price effective from a date:
 
 ### Conventions
 
-- **Standard short-context tier only.** Don't mix in batch/flex/priority or the
-  long-context (>200k) tier.
+- Record only the **standard** on-demand tier. Don't mix in batch/flex/priority.
+- If a model has short/long context tiers, record both via `context_pricing`.
 - **`fast`** holds premium overrides (e.g. Anthropic Fast mode); same shape as
   `models`/`families`.
 

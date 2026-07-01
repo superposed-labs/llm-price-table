@@ -61,12 +61,13 @@ baseline for the diff.
 
 ### 3. Read prices semantically
 
-Read the rendered page yourself and pull each model's **standard, short-context**
-tier: input, cached input (→ `cr`), output. Ignore batch/flex/priority tiers, the
-long-context (>200k) tier, and free-tier columns. Note deprecated vs current
-models — price the live one, not the deprecated one. For Anthropic also read the
-**Fast mode** premiums (→ `fast` section) and the prompt-caching multipliers
-(5-min → `cw`, 1-hour → `cw1h`).
+Read the rendered page yourself and pull each model's **standard** tier: input,
+cached input (→ `cr`), output. Ignore batch/flex/priority tiers and free-tier
+columns. If the official page has distinct **short/long context** pricing, read
+both tiers and record them via `context_pricing` (see SCHEMA.md). Note
+deprecated vs current models — price the live one, not the deprecated one. For
+Anthropic also read the **Fast mode** premiums (→ `fast` section) and the
+prompt-caching multipliers (5-min → `cw`, 1-hour → `cw1h`).
 
 ### 4. Decide family vs exact — the key judgment
 
@@ -84,7 +85,8 @@ models — price the live one, not the deprecated one. For Anthropic also read t
   ("mini" ⊂ "ge**mini**"). Keep family keys unambiguous.
 - **Resolution order**: families are tried in file order — `flash-lite` before
   `flash` before `gemini`.
-- **Short-context only**: one tier; don't mix in long-context prices.
+- **Standard tier only**: don't mix in batch/flex/priority. If the page splits
+  short/long context, record both via `context_pricing`.
 
 ### 6. Record changes correctly
 

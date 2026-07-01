@@ -13,8 +13,9 @@ See [SCHEMA.md](SCHEMA.md) for the file format and conventions.
 There is no official pricing API, and the tools that run these models are often
 newer than any published price list. Numbers here are read off official pricing
 pages by a human (with AI assistance) and **will drift** between updates. They
-model only the **standard short-context tier** and exclude batch/flex/priority
-discounts and long-context tiers. **Do not treat as billing-accurate.** No
+model only the **standard on-demand tier**: batch/flex/priority discounts are
+excluded, but models whose official page has distinct short/long context tiers
+now carry both via `context_pricing`. **Do not treat as billing-accurate.** No
 warranty. Check `updated_at` in each file for staleness.
 
 ## Using it in a project
@@ -43,7 +44,8 @@ PRs welcome. Follow the discipline that keeps the table trustworthy:
 - **Cite the official source** for every number (`source` field).
 - A price that **changed** → *add* a dated entry; don't overwrite the old one
   (history must split by period). See [SCHEMA.md](SCHEMA.md#recording-a-change-important).
-- Read the **standard short-context** tier; ignore batch/flex/priority/long-context.
+- Read the **standard** tier; ignore batch/flex/priority. If the page has
+  short/long context pricing, record both in `context_pricing`.
 - Git history is the price-change log — keep it human-authored and reviewed. A
   wrong number silently corrupts every downstream cost estimate.
 

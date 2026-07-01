@@ -26,6 +26,14 @@ def _iter_rates(data: dict):
                         yield section, key, rate
 
 
+def _rate_display(rate: dict, tier: str | None = None) -> str:
+    prefix = f"{tier}: " if tier else ""
+    return (
+        f"{prefix}in={rate.get('in')!s:>6} out={rate.get('out')!s:>6} "
+        f"cw={rate.get('cw')!s:>6} cr={rate.get('cr')!s:>6}"
+    )
+
+
 def _age_days(iso: str) -> int | None:
     try:
         return (date.today() - date.fromisoformat(iso)).days
@@ -47,8 +55,22 @@ def audit_model_prices(path: Path) -> int:
         elif age > STALE_DAYS:
             flag = f"  ⚠ stale ({age}d)"
             stale += 1
-        print(f"  [{section:9}] {key:24} in={rate.get('in')!s:>6} out={rate.get('out')!s:>6} "
-              f"observed={observed}{flag}")
+        context = rate.get("context_pricing")
+        metric = ""
+        if isinstance(context, dict):
+            metric = (
+                f" context={context.get('metric')} <= {context.get('short_max')} short"
+                if context.get("metric") and context.get("short_max")
+                else " context_pricing"
+            )
+        print(f"  [{section:9}] {key:24} {_rate_display(rate)} observed={observed}{metric}{flag}")
+        if isinstance(context, dict):
+            short = context.get("short")
+            long = context.get("long")
+            if isinstance(short, dict):
+                print(f"               {_rate_display(short, 'short')}")
+            if isinstance(long, dict):
+                print(f"               {_rate_display(long, 'long')}")
     print(f"  {len(rows)} rate entries, {stale} stale (> {STALE_DAYS}d).")
     return stale
 
