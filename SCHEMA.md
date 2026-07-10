@@ -42,8 +42,12 @@ A dated list; each entry is the price effective from a date:
 ```
 
 - `in` / `out` — input / output price.
-- `cw` — cache **write**, 5-minute TTL (Anthropic ≈ 1.25× input). Providers with
-  **no** per-token cache-write fee (OpenAI, Google) set `cw = in`.
+- `cw` — the model's default cache **write** rate. For Anthropic this is the
+  5-minute TTL rate (≈ 1.25× input). OpenAI models before GPT-5.6 and Google
+  have no additional per-token cache-write fee, so set `cw = in`. GPT-5.6 and
+  later bill both implicit and explicit cache writes at 1.25× input; their
+  current cache TTL is at least 30 minutes, so use the documented cache-write
+  price rather than assuming `cw = in`.
 - `cw1h` — cache **write**, 1-hour TTL (Anthropic = 2× input). **Optional**;
   omit when there's no distinct 1h rate and the consumer falls back to `cw`.
 - `cr` — cache **read** / "cached input" (≈ 1/10th of input).

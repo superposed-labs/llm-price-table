@@ -62,12 +62,16 @@ baseline for the diff.
 ### 3. Read prices semantically
 
 Read the rendered page yourself and pull each model's **standard** tier: input,
-cached input (→ `cr`), output. Ignore batch/flex/priority tiers and free-tier
-columns. If the official page has distinct **short/long context** pricing, read
-both tiers and record them via `context_pricing` (see SCHEMA.md). Note
-deprecated vs current models — price the live one, not the deprecated one. For
-Anthropic also read the **Fast mode** premiums (→ `fast` section) and the
-prompt-caching multipliers (5-min → `cw`, 1-hour → `cw1h`).
+cached input (→ `cr`), cache write (→ `cw`, when listed), and output. Ignore
+batch/flex/priority tiers and free-tier columns. If the official page has
+distinct **short/long context** pricing, read both tiers and record them via
+`context_pricing` (see SCHEMA.md). Note deprecated vs current models — price the
+live one, not the deprecated one. For Anthropic also read the **Fast mode**
+premiums (→ `fast` section) and the prompt-caching multipliers (5-min → `cw`,
+1-hour → `cw1h`). For OpenAI, models before GPT-5.6 have no additional cache-
+write fee (`cw = in`), while GPT-5.6 and later list cache writes at 1.25× input
+with a minimum 30-minute TTL; preserve that documented rate in both context
+tiers.
 
 ### 4. Decide family vs exact — the key judgment
 
@@ -87,6 +91,9 @@ prompt-caching multipliers (5-min → `cw`, 1-hour → `cw1h`).
   `flash` before `gemini`.
 - **Standard tier only**: don't mix in batch/flex/priority. If the page splits
   short/long context, record both via `context_pricing`.
+- **Cache-write semantics vary by model generation**: `cw` is the model's
+  default write rate, not universally a 5-minute TTL. Do not apply the older
+  OpenAI `cw = in` convention to GPT-5.6 or later.
 
 ### 6. Record changes correctly
 
